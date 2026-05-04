@@ -1,0 +1,18 @@
+{
+  "name": "jobflow",
+  "version": "1.0.0",
+  "description": "JobFlow — A full-stack job application tracker built with the MERN stack.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "install:client": "npm install --prefix client",
+    "install:server": "npm install --prefix server",
+    "install:all": "npm run install:client && npm run install:server",
+    "dev": "npm run dev:client & npm run dev:server"
+  },
+  "keywords": ["job-tracker", "mern", "react", "express"],
+  "author": "",
+  "license": "MIT"
+}
