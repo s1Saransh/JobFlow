@@ -1,12 +1,52 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AddApplication() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    company: "",
+    role: "",
+    location: "",
+    status: "applied",
+    appliedDate: "",
+    notes: "",
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: send data to backend
-    navigate("/applications");
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to save application");
+      }
+
+      // Success — go to dashboard to see it
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -18,6 +58,12 @@ export default function AddApplication() {
         </div>
       </div>
 
+      {error && (
+        <div style={{ color: "var(--accent-red)", marginBottom: "1rem", padding: "0.75rem", backgroundColor: "rgba(255,0,0,0.1)", borderRadius: "8px" }}>
+          {error}
+        </div>
+      )}
+
       <form className="card form-card" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="company">Company</label>
@@ -27,24 +73,41 @@ export default function AddApplication() {
             className="input"
             placeholder="e.g. Google"
             required
+            value={formData.company}
+            onChange={handleChange}
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="position">Position</label>
+          <label htmlFor="role">Position / Role</label>
           <input
-            id="position"
+            id="role"
             type="text"
             className="input"
             placeholder="e.g. Frontend Engineer"
             required
+            value={formData.role}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="location">Location</label>
+          <input
+            id="location"
+            type="text"
+            className="input"
+            placeholder="e.g. Remote, Berlin, New York"
+            required
+            value={formData.location}
+            onChange={handleChange}
           />
         </div>
 
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="status">Status</label>
-            <select id="status" className="input select">
+            <select id="status" className="input select" value={formData.status} onChange={handleChange}>
               <option value="applied">Applied</option>
               <option value="interview">Interview</option>
               <option value="offer">Offer</option>
@@ -53,8 +116,8 @@ export default function AddApplication() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="date">Date Applied</label>
-            <input id="date" type="date" className="input" />
+            <label htmlFor="appliedDate">Date Applied</label>
+            <input id="appliedDate" type="date" className="input" value={formData.appliedDate} onChange={handleChange} />
           </div>
         </div>
 
@@ -65,6 +128,8 @@ export default function AddApplication() {
             className="input textarea"
             rows="4"
             placeholder="Any notes about this application…"
+            value={formData.notes}
+            onChange={handleChange}
           />
         </div>
 
@@ -72,8 +137,8 @@ export default function AddApplication() {
           <button type="button" className="btn btn-ghost" onClick={() => navigate(-1)}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-primary">
-            Save Application
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Saving..." : "Save Application"}
           </button>
         </div>
       </form>
