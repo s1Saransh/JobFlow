@@ -16,6 +16,10 @@ export default function ApplicationDetail() {
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [newStatus, setNewStatus] = useState("");
+  
+  // Edit Mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -24,7 +28,17 @@ export default function ApplicationDetail() {
       .then(r => r.json())
       .then(data => {
         const found = Array.isArray(data) ? data.find(a => a._id === id) : null;
-        if (!found) { setError("Application not found"); } else { setApp(found); setNewStatus(found.status); }
+        if (!found) { setError("Application not found"); } else { 
+          setApp(found); 
+          setNewStatus(found.status);
+          setEditData({
+            company: found.company,
+            role: found.role,
+            location: found.location,
+            notes: found.notes || "",
+            jobUrl: found.jobUrl || ""
+          });
+        }
       })
       .catch(() => setError("Failed to load application"))
       .finally(() => setLoading(false));
@@ -43,6 +57,26 @@ export default function ApplicationDetail() {
       const updated = await res.json();
       setApp(updated);
     } catch { setError("Failed to update status"); }
+    finally { setUpdating(false); }
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const handleSaveEdit = async () => {
+    setUpdating(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/api/applications/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editData),
+      });
+      const updated = await res.json();
+      setApp(updated);
+      setIsEditing(false);
+    } catch { setError("Failed to update application"); }
     finally { setUpdating(false); }
   };
 
@@ -116,36 +150,84 @@ export default function ApplicationDetail() {
         <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10">
           <div className="max-w-[1024px] mx-auto space-y-10">
             {/* Job Identity */}
-            <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)]">
-              <div className="flex items-start gap-6">
-                <div className="w-16 h-16 rounded-lg bg-[#e4e1ee] flex items-center justify-center text-[#3525cd]">
+            <section className="flex flex-col md:flex-row md:items-start justify-between gap-6 bg-white p-6 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)]">
+              <div className="flex items-start gap-6 flex-1 w-full">
+                <div className="w-16 h-16 rounded-lg bg-[#e4e1ee] flex items-center justify-center text-[#3525cd] flex-shrink-0">
                   <span className="material-symbols-outlined text-[32px]">corporate_fare</span>
                 </div>
-                <div>
-                  <h2 className="text-4xl font-bold text-[#1b1b24]">{app.role}</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xl font-semibold text-[#58579b]">{app.company}</span>
-                    <span className="w-1 h-1 rounded-full bg-[#c7c4d8]"></span>
-                    <span className="text-base text-[#777587]">{app.location}</span>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    <span className={`px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 ${statusStyle(app.status)}`}>
-                      <span className="w-2 h-2 rounded-full bg-current"></span>
-                      {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                    </span>
-                    {app.appliedDate && (
-                      <span className="bg-[#f0ecf9] text-[#464555] px-4 py-1 rounded-full text-sm font-semibold">
-                        Applied {new Date(app.appliedDate).toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
+                <div className="flex-1">
+                  {isEditing ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs text-[#464555] font-semibold">Role / Title</label>
+                        <input name="role" value={editData.role} onChange={handleEditChange} className="w-full px-3 py-1 bg-[#fcf8ff] border border-[#c7c4d8] rounded focus:ring-1 focus:ring-[#3525cd] outline-none text-xl font-bold" />
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <label className="text-xs text-[#464555] font-semibold">Company</label>
+                          <input name="company" value={editData.company} onChange={handleEditChange} className="w-full px-3 py-1 bg-[#fcf8ff] border border-[#c7c4d8] rounded focus:ring-1 focus:ring-[#3525cd] outline-none text-base" />
+                        </div>
+                        <div className="flex-1">
+                          <label className="text-xs text-[#464555] font-semibold">Location</label>
+                          <input name="location" value={editData.location} onChange={handleEditChange} className="w-full px-3 py-1 bg-[#fcf8ff] border border-[#c7c4d8] rounded focus:ring-1 focus:ring-[#3525cd] outline-none text-base" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-[#464555] font-semibold">Job URL</label>
+                        <input name="jobUrl" value={editData.jobUrl} onChange={handleEditChange} placeholder="https://..." className="w-full px-3 py-1 bg-[#fcf8ff] border border-[#c7c4d8] rounded focus:ring-1 focus:ring-[#3525cd] outline-none text-sm" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-[#464555] font-semibold">Notes</label>
+                        <textarea name="notes" value={editData.notes} onChange={handleEditChange} rows="3" className="w-full px-3 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded focus:ring-1 focus:ring-[#3525cd] outline-none text-sm" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <h2 className="text-4xl font-bold text-[#1b1b24]">{app.role}</h2>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xl font-semibold text-[#58579b]">{app.company}</span>
+                        <span className="w-1 h-1 rounded-full bg-[#c7c4d8]"></span>
+                        <span className="text-base text-[#777587]">{app.location}</span>
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                        <span className={`px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 ${statusStyle(app.status)}`}>
+                          <span className="w-2 h-2 rounded-full bg-current"></span>
+                          {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                        </span>
+                        {app.appliedDate && (
+                          <span className="bg-[#f0ecf9] text-[#464555] px-4 py-1 rounded-full text-sm font-semibold">
+                            Applied {new Date(app.appliedDate).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex flex-row md:flex-col gap-2">
-                <button onClick={handleDelete}
-                  className="border border-[#ffdad6] text-[#ba1a1a] px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#ffdad6]/20 transition-all flex items-center justify-center gap-2">
-                  <span className="material-symbols-outlined text-[18px]">delete</span>Delete
-                </button>
+              <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0 flex-shrink-0">
+                {isEditing ? (
+                  <>
+                    <button onClick={handleSaveEdit} disabled={updating}
+                      className="bg-[#3525cd] text-white px-6 py-2 rounded-full text-sm font-semibold hover:brightness-110 transition-all flex items-center justify-center gap-2">
+                      {updating ? "Saving..." : <><span className="material-symbols-outlined text-[18px]">check</span>Save</>}
+                    </button>
+                    <button onClick={() => setIsEditing(false)}
+                      className="border border-[#c7c4d8] text-[#464555] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#eae6f4] transition-all flex items-center justify-center gap-2">
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setIsEditing(true)}
+                      className="border border-[#c7c4d8] text-[#3525cd] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#eae6f4] transition-all flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[18px]">edit</span>Edit Details
+                    </button>
+                    <button onClick={handleDelete}
+                      className="border border-[#ffdad6] text-[#ba1a1a] px-6 py-2 rounded-full text-sm font-semibold hover:bg-[#ffdad6]/20 transition-all flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[18px]">delete</span>Delete
+                    </button>
+                  </>
+                )}
               </div>
             </section>
 
@@ -204,7 +286,7 @@ export default function ApplicationDetail() {
                 </div>
 
                 {/* Notes */}
-                {app.notes && (
+                {app.notes && !isEditing && (
                   <div className="bg-white p-6 md:p-10 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)]">
                     <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#3525cd]">sticky_note_2</span>Notes
@@ -219,7 +301,7 @@ export default function ApplicationDetail() {
               {/* Right: Info */}
               <div className="space-y-6">
                 {/* Quick Links */}
-                {app.jobUrl && (
+                {app.jobUrl && !isEditing && (
                   <div className="bg-white p-6 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)]">
                     <h3 className="text-xs font-semibold text-[#777587] uppercase tracking-wider mb-4">Quick Links</h3>
                     <a href={app.jobUrl} target="_blank" rel="noopener noreferrer"

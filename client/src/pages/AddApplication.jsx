@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function AddApplication() {
   const navigate = useNavigate();
@@ -10,12 +10,12 @@ export default function AddApplication() {
     role: "",
     location: "",
     status: "applied",
-    appliedDate: "",
+    appliedDate: new Date().toISOString().split("T")[0],
     notes: "",
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -25,6 +25,7 @@ export default function AddApplication() {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) { navigate("/login"); return; }
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: {
@@ -40,8 +41,7 @@ export default function AddApplication() {
         throw new Error(data.message || "Failed to save application");
       }
 
-      // Success — go to dashboard to see it
-      navigate("/");
+      navigate("/applications");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -50,98 +50,173 @@ export default function AddApplication() {
   };
 
   return (
-    <div className="page-container page-narrow">
-      <div className="page-header">
-        <div>
-          <h1>Add Application</h1>
-          <p className="page-subtitle">Log a new job application.</p>
+    <div className="flex min-h-screen bg-[#fcf8ff] text-[#1b1b24]">
+      {/* Sidebar */}
+      <aside className="bg-[#f5f2ff] w-64 hidden md:flex flex-col py-6 px-3 border-r border-[#c7c4d8]/30 sticky top-0 h-screen">
+        <div className="px-4 mb-8">
+          <span className="font-bold text-2xl text-[#3525cd]">JobFlow</span>
+          <p className="text-xs text-[#464555]/70 mt-1">Application Tracker</p>
         </div>
+        <nav className="flex flex-col gap-1 flex-grow">
+          <Link to="/" className="flex items-center gap-3 py-3 px-4 text-[#464555] hover:text-[#3525cd] hover:bg-[#e4e1ee] transition-all text-sm rounded-r-full">
+            <span className="material-symbols-outlined">dashboard</span>Dashboard
+          </Link>
+          <Link to="/applications" className="flex items-center gap-3 py-3 px-4 text-[#464555] hover:text-[#3525cd] hover:bg-[#e4e1ee] transition-all text-sm rounded-r-full">
+            <span className="material-symbols-outlined">description</span>Applications
+          </Link>
+          <Link to="/add" className="flex items-center gap-3 py-3 px-4 text-[#3525cd] bg-[#b6b4ff]/20 border-r-4 border-[#3525cd] rounded-r-full font-semibold text-sm">
+            <span className="material-symbols-outlined">add_circle</span>Add New
+          </Link>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-grow flex flex-col min-w-0">
+        <header className="bg-[#fcf8ff] shadow-sm flex items-center w-full px-6 h-16 sticky top-0 z-40">
+          <h1 className="font-bold text-xl text-[#3525cd] md:hidden mr-4">JobFlow</h1>
+          <h2 className="text-xl font-semibold text-[#1b1b24] hidden md:block">Add New Application</h2>
+        </header>
+
+        <main className="p-6 md:p-10 max-w-2xl mx-auto w-full">
+          <div className="bg-white p-8 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)] border border-[#c7c4d8]/30">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-12 h-12 bg-[#e4e1ee] rounded-lg flex items-center justify-center text-[#3525cd]">
+                <span className="material-symbols-outlined text-2xl">post_add</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-[#1b1b24]">New Application</h2>
+                <p className="text-sm text-[#464555]">Track your next career opportunity.</p>
+              </div>
+            </div>
+
+            {error && (
+              <div className="mb-6 p-4 bg-[#ffdad6] text-[#ba1a1a] rounded-lg text-sm font-medium">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="company" className="text-sm font-semibold text-[#1b1b24]">Company *</label>
+                  <input
+                    id="company"
+                    name="company"
+                    type="text"
+                    required
+                    placeholder="e.g. Google"
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="role" className="text-sm font-semibold text-[#1b1b24]">Role / Title *</label>
+                  <input
+                    id="role"
+                    name="role"
+                    type="text"
+                    required
+                    placeholder="e.g. Senior Designer"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="location" className="text-sm font-semibold text-[#1b1b24]">Location *</label>
+                  <input
+                    id="location"
+                    name="location"
+                    type="text"
+                    required
+                    placeholder="e.g. Remote, NY"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="status" className="text-sm font-semibold text-[#1b1b24]">Status</label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                  >
+                    <option value="applied">Applied</option>
+                    <option value="interview">Interview</option>
+                    <option value="offer">Offer</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="appliedDate" className="text-sm font-semibold text-[#1b1b24]">Date Applied</label>
+                <input
+                  id="appliedDate"
+                  name="appliedDate"
+                  type="date"
+                  value={formData.appliedDate}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="notes" className="text-sm font-semibold text-[#1b1b24]">Notes</label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  rows="4"
+                  placeholder="Key details, recruiter info, etc..."
+                  value={formData.notes}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm resize-y"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t border-[#c7c4d8]/30">
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="px-6 py-2 rounded-full border border-[#c7c4d8] text-[#464555] font-semibold hover:bg-[#eae6f4] transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-2 rounded-full bg-[#3525cd] text-white font-semibold hover:brightness-110 transition-all disabled:opacity-50 flex-grow text-center flex items-center justify-center gap-2"
+                >
+                  {loading ? "Saving..." : <><span className="material-symbols-outlined text-[18px]">save</span> Save Application</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
       </div>
 
-      {error && (
-        <div style={{ color: "var(--accent-red)", marginBottom: "1rem", padding: "0.75rem", backgroundColor: "rgba(255,0,0,0.1)", borderRadius: "8px" }}>
-          {error}
-        </div>
-      )}
-
-      <form className="card form-card" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="company">Company</label>
-          <input
-            id="company"
-            type="text"
-            className="input"
-            placeholder="e.g. Google"
-            required
-            value={formData.company}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="role">Position / Role</label>
-          <input
-            id="role"
-            type="text"
-            className="input"
-            placeholder="e.g. Frontend Engineer"
-            required
-            value={formData.role}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="location">Location</label>
-          <input
-            id="location"
-            type="text"
-            className="input"
-            placeholder="e.g. Remote, Berlin, New York"
-            required
-            value={formData.location}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="status">Status</label>
-            <select id="status" className="input select" value={formData.status} onChange={handleChange}>
-              <option value="applied">Applied</option>
-              <option value="interview">Interview</option>
-              <option value="offer">Offer</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="appliedDate">Date Applied</label>
-            <input id="appliedDate" type="date" className="input" value={formData.appliedDate} onChange={handleChange} />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="notes">Notes</label>
-          <textarea
-            id="notes"
-            className="input textarea"
-            rows="4"
-            placeholder="Any notes about this application…"
-            value={formData.notes}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-actions">
-          <button type="button" className="btn btn-ghost" onClick={() => navigate(-1)}>
-            Cancel
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Saving..." : "Save Application"}
-          </button>
-        </div>
-      </form>
+      {/* Mobile Nav */}
+      <nav className="md:hidden fixed bottom-0 w-full bg-[#fcf8ff] shadow-[0_-1px_3px_rgba(0,0,0,0.1)] flex justify-around py-2 px-4 z-50">
+        <Link to="/" className="flex flex-col items-center gap-1 text-[#464555]">
+          <span className="material-symbols-outlined">dashboard</span>
+          <span className="text-xs">Home</span>
+        </Link>
+        <Link to="/applications" className="flex flex-col items-center gap-1 text-[#464555]">
+          <span className="material-symbols-outlined">description</span>
+          <span className="text-xs">Apps</span>
+        </Link>
+        <Link to="/add" className="flex flex-col items-center gap-1 text-[#3525cd]">
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
+          <span className="text-xs">Add</span>
+        </Link>
+      </nav>
     </div>
   );
 }
