@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 
 // ─── Config ──────────────────────────────────────────
 dotenv.config();
@@ -26,6 +27,7 @@ app.get("/api/health", (_req, res) => {
 // ─── API Routes ──────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/profile", profileRoutes);
 
 // ─── Start server ───────────────────────────────────
 app.listen(PORT, () => {

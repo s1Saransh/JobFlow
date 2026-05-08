@@ -143,6 +143,19 @@ export default function ApplicationDetail() {
             <Link to="/add" className="bg-[#3525cd] text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-1 hover:shadow-lg transition-all">
               <span className="material-symbols-outlined text-[18px]">add</span>New Application
             </Link>
+            <Link
+              to="/profile"
+              id="topbar-profile-link-detail"
+              title="View your profile"
+              className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-[#c7c4d8]/60 hover:bg-[#eae6f4] hover:border-[#3525cd]/40 transition-all group ml-1"
+            >
+              <div className="w-7 h-7 rounded-full bg-[#3525cd]/15 flex items-center justify-center text-[#3525cd] text-xs font-bold flex-shrink-0 group-hover:bg-[#3525cd]/25 transition-colors">
+                {(() => { const u = JSON.parse(localStorage.getItem("user") || "{}"); return (u.name || "U").charAt(0).toUpperCase(); })()}
+              </div>
+              <span className="text-sm text-[#464555] font-medium group-hover:text-[#3525cd] transition-colors hidden sm:inline">
+                {JSON.parse(localStorage.getItem("user") || "{}").name || "User"}
+              </span>
+            </Link>
           </div>
         </header>
 

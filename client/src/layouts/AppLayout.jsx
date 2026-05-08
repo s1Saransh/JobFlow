@@ -1,12 +1,20 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 const navItems = [
-  { to: "/", label: "Dashboard", icon: "📊" },
+  { to: "/",             label: "Dashboard",    icon: "📊" },
   { to: "/applications", label: "Applications", icon: "📋" },
-  { to: "/add", label: "Add New", icon: "➕" },
+  { to: "/add",          label: "Add New",      icon: "➕" },
+  { to: "/profile",      label: "Profile",      icon: "👤" },
 ];
 
 export default function AppLayout() {
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <div className="app-layout">
       {/* ── Sidebar ──────────────────────────────── */}
@@ -33,9 +41,16 @@ export default function AppLayout() {
         </nav>
 
         <div className="sidebar-footer">
-          <NavLink to="/login" className="btn btn-ghost btn-full">
-            Sign Out
+          <NavLink to="/profile" className="sidebar-profile-chip">
+            <div className="sidebar-chip-initials">?</div>
+            <div className="sidebar-chip-info">
+              <span className="sidebar-chip-name">My Profile</span>
+              <span className="sidebar-chip-email">View &amp; edit</span>
+            </div>
           </NavLink>
+          <button onClick={handleSignOut} className="btn btn-ghost btn-full" id="sign-out-btn">
+            Sign Out
+          </button>
         </div>
       </aside>
 

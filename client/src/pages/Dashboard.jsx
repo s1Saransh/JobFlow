@@ -71,7 +71,20 @@ export default function Dashboard() {
             <Link to="/add" className="hidden lg:flex items-center gap-1 bg-[#3525cd] text-white py-2 px-4 rounded-full text-sm font-semibold hover:brightness-110 transition-all">
               <span className="material-symbols-outlined text-[18px]">add</span>New Application
             </Link>
-            <span className="text-sm text-[#464555] font-medium">{user.name || "User"}</span>
+            <Link
+              to="/profile"
+              id="topbar-profile-link"
+              title="View your profile"
+              className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-[#c7c4d8]/60 hover:bg-[#eae6f4] hover:border-[#3525cd]/40 transition-all group"
+            >
+              <div className="w-7 h-7 rounded-full bg-[#3525cd]/15 flex items-center justify-center text-[#3525cd] text-xs font-bold flex-shrink-0 group-hover:bg-[#3525cd]/25 transition-colors">
+                {(user.name || "U").charAt(0).toUpperCase()}
+              </div>
+              <span className="text-sm text-[#464555] font-medium group-hover:text-[#3525cd] transition-colors">
+                {user.name || "User"}
+              </span>
+              <span className="material-symbols-outlined text-[16px] text-[#c7c4d8] group-hover:text-[#3525cd] transition-colors">chevron_right</span>
+            </Link>
           </div>
         </header>
 

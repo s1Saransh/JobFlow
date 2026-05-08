@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function AddApplication() {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
@@ -72,9 +73,24 @@ export default function AddApplication() {
 
       {/* Main Content */}
       <div className="flex-grow flex flex-col min-w-0">
-        <header className="bg-[#fcf8ff] shadow-sm flex items-center w-full px-6 h-16 sticky top-0 z-40">
-          <h1 className="font-bold text-xl text-[#3525cd] md:hidden mr-4">JobFlow</h1>
-          <h2 className="text-xl font-semibold text-[#1b1b24] hidden md:block">Add New Application</h2>
+        <header className="bg-[#fcf8ff] shadow-sm flex items-center justify-between w-full px-6 h-16 sticky top-0 z-40">
+          <div className="flex items-center gap-3">
+            <h1 className="font-bold text-xl text-[#3525cd] md:hidden mr-4">JobFlow</h1>
+            <h2 className="text-xl font-semibold text-[#1b1b24] hidden md:block">Add New Application</h2>
+          </div>
+          <Link
+            to="/profile"
+            id="topbar-profile-link-add"
+            title="View your profile"
+            className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-[#c7c4d8]/60 hover:bg-[#eae6f4] hover:border-[#3525cd]/40 transition-all group"
+          >
+            <div className="w-7 h-7 rounded-full bg-[#3525cd]/15 flex items-center justify-center text-[#3525cd] text-xs font-bold flex-shrink-0 group-hover:bg-[#3525cd]/25 transition-colors">
+              {(user.name || "U").charAt(0).toUpperCase()}
+            </div>
+            <span className="text-sm text-[#464555] font-medium group-hover:text-[#3525cd] transition-colors hidden sm:inline">
+              {user.name || "User"}
+            </span>
+          </Link>
         </header>
 
         <main className="p-6 md:p-10 max-w-2xl mx-auto w-full">

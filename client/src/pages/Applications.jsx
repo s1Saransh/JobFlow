@@ -20,6 +20,7 @@ export default function Applications() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -78,6 +79,19 @@ export default function Applications() {
             <button className="p-2 rounded-full text-[#464555] hover:bg-[#eae6f4] transition-colors">
               <span className="material-symbols-outlined">notifications</span>
             </button>
+            <Link
+              to="/profile"
+              id="topbar-profile-link-apps"
+              title="View your profile"
+              className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-[#c7c4d8]/60 hover:bg-[#eae6f4] hover:border-[#3525cd]/40 transition-all group"
+            >
+              <div className="w-7 h-7 rounded-full bg-[#3525cd]/15 flex items-center justify-center text-[#3525cd] text-xs font-bold flex-shrink-0 group-hover:bg-[#3525cd]/25 transition-colors">
+                {(user.name || "U").charAt(0).toUpperCase()}
+              </div>
+              <span className="text-sm text-[#464555] font-medium group-hover:text-[#3525cd] transition-colors hidden sm:inline">
+                {user.name || "User"}
+              </span>
+            </Link>
           </div>
         </header>
 
