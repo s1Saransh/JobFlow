@@ -51,70 +51,74 @@ export default function AddApplication() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#fcf8ff] text-[#1b1b24]">
-      {/* Sidebar */}
-      <aside className="bg-[#f5f2ff] w-64 hidden md:flex flex-col py-6 px-3 border-r border-[#c7c4d8]/30 sticky top-0 h-screen">
-        <div className="px-4 mb-8">
-          <span className="font-bold text-2xl text-[#3525cd]">JobFlow</span>
-          <p className="text-xs text-[#464555]/70 mt-1">Application Tracker</p>
+    <div className="flex min-h-screen bg-background text-on-surface font-body-lg">
+      {/* SideNavBar Component */}
+      <aside className="bg-surface-container-low dark:bg-on-background shadow-sm docked left-0 h-full w-64 hidden md:flex flex-col gap-base py-md px-sm border-r border-outline-variant/30 dark:border-outline/20 sticky top-0">
+        <div className="px-md py-base mb-lg">
+          <span className="font-h2 text-h2 font-bold text-primary dark:text-primary-fixed">JobFlow</span>
+          <p className="font-label-sm text-on-surface-variant/70 mt-xs">Application Tracker</p>
         </div>
-        <nav className="flex flex-col gap-1 flex-grow">
-          <Link to="/" className="flex items-center gap-3 py-3 px-4 text-[#464555] hover:text-[#3525cd] hover:bg-[#e4e1ee] transition-all text-sm rounded-r-full">
-            <span className="material-symbols-outlined">dashboard</span>Dashboard
+        <nav className="flex flex-col gap-xs flex-grow">
+          <Link to="/" className="flex items-center gap-sm py-sm px-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            Dashboard
           </Link>
-          <Link to="/applications" className="flex items-center gap-3 py-3 px-4 text-[#464555] hover:text-[#3525cd] hover:bg-[#e4e1ee] transition-all text-sm rounded-r-full">
-            <span className="material-symbols-outlined">description</span>Applications
+          <Link to="/applications" className="flex items-center gap-sm py-sm px-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="description">description</span>
+            Applications
           </Link>
-          <Link to="/add" className="flex items-center gap-3 py-3 px-4 text-[#3525cd] bg-[#b6b4ff]/20 border-r-4 border-[#3525cd] rounded-r-full font-semibold text-sm">
-            <span className="material-symbols-outlined">add_circle</span>Add New
+          <Link to="/add" className="flex items-center gap-sm py-sm px-md text-primary dark:text-primary-fixed bg-secondary-container/20 dark:bg-secondary-container/10 border-r-4 border-primary rounded-r-full font-label-md text-label-md transition-transform">
+            <span className="material-symbols-outlined" data-icon="add_circle" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
+            Add New
           </Link>
         </nav>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <div className="flex-grow flex flex-col min-w-0">
-        <header className="bg-[#fcf8ff] shadow-sm flex items-center justify-between w-full px-6 h-16 sticky top-0 z-40">
-          <div className="flex items-center gap-3">
-            <h1 className="font-bold text-xl text-[#3525cd] md:hidden mr-4">JobFlow</h1>
-            <h2 className="text-xl font-semibold text-[#1b1b24] hidden md:block">Add New Application</h2>
+        {/* TopAppBar Component */}
+        <header className="bg-surface dark:bg-on-background shadow-sm docked full-width top-0 z-40 flex justify-between items-center w-full px-md h-xl max-w-full">
+          <div className="flex items-center gap-md">
+            <h1 className="font-h3 text-h3 font-semibold text-primary dark:text-primary-fixed md:hidden">JobFlow</h1>
+            <h2 className="text-h3 font-h3 text-on-surface hidden md:block">Add New Application</h2>
           </div>
-          <Link
-            to="/profile"
-            id="topbar-profile-link-add"
-            title="View your profile"
-            className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-[#c7c4d8]/60 hover:bg-[#eae6f4] hover:border-[#3525cd]/40 transition-all group"
-          >
-            <div className="w-7 h-7 rounded-full bg-[#3525cd]/15 flex items-center justify-center text-[#3525cd] text-xs font-bold flex-shrink-0 group-hover:bg-[#3525cd]/25 transition-colors">
-              {(user.name || "U").charAt(0).toUpperCase()}
+          <div className="flex items-center gap-md">
+            <div className="flex items-center gap-sm">
+              <Link to="/profile" title="View your profile" className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-outline-variant/60 hover:bg-surface-container-high hover:border-primary/40 transition-all group">
+                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0 group-hover:bg-primary/25 transition-colors">
+                  {(user.name || "U").charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm text-on-surface-variant font-medium group-hover:text-primary transition-colors hidden sm:inline">
+                  {user.name || "User"}
+                </span>
+              </Link>
             </div>
-            <span className="text-sm text-[#464555] font-medium group-hover:text-[#3525cd] transition-colors hidden sm:inline">
-              {user.name || "User"}
-            </span>
-          </Link>
+          </div>
         </header>
 
-        <main className="p-6 md:p-10 max-w-2xl mx-auto w-full">
-          <div className="bg-white p-8 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)] border border-[#c7c4d8]/30">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-[#e4e1ee] rounded-lg flex items-center justify-center text-[#3525cd]">
-                <span className="material-symbols-outlined text-2xl">post_add</span>
+        {/* Content Canvas */}
+        <main className="p-md md:p-lg lg:p-xl max-w-2xl mx-auto w-full space-y-xl overflow-y-auto">
+          <div className="bg-white p-lg rounded-xl shadow-resting border border-outline-variant/30">
+            <div className="flex items-center gap-sm mb-lg">
+              <div className="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center text-primary">
+                <span className="material-symbols-outlined text-[24px]">post_add</span>
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-[#1b1b24]">New Application</h2>
-                <p className="text-sm text-[#464555]">Track your next career opportunity.</p>
+                <h2 className="text-h2 font-h2 text-on-surface">New Application</h2>
+                <p className="font-body-sm text-on-surface-variant mt-xs">Track your next career opportunity.</p>
               </div>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-[#ffdad6] text-[#ba1a1a] rounded-lg text-sm font-medium">
+              <div className="mb-md p-md bg-error-container text-on-error-container rounded-lg font-label-md">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="company" className="text-sm font-semibold text-[#1b1b24]">Company *</label>
+            <form onSubmit={handleSubmit} className="space-y-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div className="space-y-xs">
+                  <label htmlFor="company" className="font-label-md text-on-surface">Company *</label>
                   <input
                     id="company"
                     name="company"
@@ -123,11 +127,11 @@ export default function AddApplication() {
                     placeholder="e.g. Google"
                     value={formData.company}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                    className="w-full px-md py-sm bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-sm text-on-surface"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label htmlFor="role" className="text-sm font-semibold text-[#1b1b24]">Role / Title *</label>
+                <div className="space-y-xs">
+                  <label htmlFor="role" className="font-label-md text-on-surface">Role / Title *</label>
                   <input
                     id="role"
                     name="role"
@@ -136,14 +140,14 @@ export default function AddApplication() {
                     placeholder="e.g. Senior Designer"
                     value={formData.role}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                    className="w-full px-md py-sm bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-sm text-on-surface"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="location" className="text-sm font-semibold text-[#1b1b24]">Location *</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div className="space-y-xs">
+                  <label htmlFor="location" className="font-label-md text-on-surface">Location *</label>
                   <input
                     id="location"
                     name="location"
@@ -152,87 +156,69 @@ export default function AddApplication() {
                     placeholder="e.g. Remote, NY"
                     value={formData.location}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
+                    className="w-full px-md py-sm bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-sm text-on-surface"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label htmlFor="status" className="text-sm font-semibold text-[#1b1b24]">Status</label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
+                <div className="space-y-xs">
+                  <label htmlFor="appliedDate" className="font-label-md text-on-surface">Applied Date</label>
+                  <input
+                    id="appliedDate"
+                    name="appliedDate"
+                    type="date"
+                    required
+                    value={formData.appliedDate}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
-                  >
-                    <option value="applied">Applied</option>
-                    <option value="interview">Interview</option>
-                    <option value="offer">Offer</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
+                    className="w-full px-md py-sm bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-sm text-on-surface"
+                  />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="appliedDate" className="text-sm font-semibold text-[#1b1b24]">Date Applied</label>
-                <input
-                  id="appliedDate"
-                  name="appliedDate"
-                  type="date"
-                  value={formData.appliedDate}
+              <div className="space-y-xs">
+                <label htmlFor="status" className="font-label-md text-on-surface">Initial Status</label>
+                <select
+                  id="status"
+                  name="status"
+                  value={formData.status}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm"
-                />
+                  className="w-full px-md py-sm bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-sm text-on-surface"
+                >
+                  <option value="applied">Applied</option>
+                  <option value="interview">Interviewing</option>
+                  <option value="offer">Offer Received</option>
+                  <option value="rejected">Rejected</option>
+                </select>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="notes" className="text-sm font-semibold text-[#1b1b24]">Notes</label>
+              <div className="space-y-xs">
+                <label htmlFor="notes" className="font-label-md text-on-surface">Notes / Description (Optional)</label>
                 <textarea
                   id="notes"
                   name="notes"
                   rows="4"
-                  placeholder="Key details, recruiter info, etc..."
+                  placeholder="Link to job description, key requirements, etc."
                   value={formData.notes}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 bg-[#fcf8ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] outline-none transition-all text-sm resize-y"
-                />
+                  className="w-full px-md py-sm bg-surface-bright border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-sm text-on-surface resize-y"
+                ></textarea>
               </div>
 
-              <div className="flex gap-4 pt-4 border-t border-[#c7c4d8]/30">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="px-6 py-2 rounded-full border border-[#c7c4d8] text-[#464555] font-semibold hover:bg-[#eae6f4] transition-all"
-                >
+              <div className="flex justify-end gap-sm pt-sm">
+                <button type="button" onClick={() => navigate(-1)} className="px-lg py-sm rounded-full font-label-md text-primary border border-outline-variant hover:bg-surface-container-high transition-colors">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-6 py-2 rounded-full bg-[#3525cd] text-white font-semibold hover:brightness-110 transition-all disabled:opacity-50 flex-grow text-center flex items-center justify-center gap-2"
-                >
-                  {loading ? "Saving..." : <><span className="material-symbols-outlined text-[18px]">save</span> Save Application</>}
+                <button type="submit" disabled={loading} className="px-lg py-sm rounded-full font-label-md bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-sm hover:shadow-hover transition-all disabled:opacity-50 flex items-center gap-xs">
+                  {loading ? "Saving..." : (
+                    <>
+                      <span className="material-symbols-outlined text-[18px]">save</span>
+                      Save Application
+                    </>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </main>
       </div>
-
-      {/* Mobile Nav */}
-      <nav className="md:hidden fixed bottom-0 w-full bg-[#fcf8ff] shadow-[0_-1px_3px_rgba(0,0,0,0.1)] flex justify-around py-2 px-4 z-50">
-        <Link to="/" className="flex flex-col items-center gap-1 text-[#464555]">
-          <span className="material-symbols-outlined">dashboard</span>
-          <span className="text-xs">Home</span>
-        </Link>
-        <Link to="/applications" className="flex flex-col items-center gap-1 text-[#464555]">
-          <span className="material-symbols-outlined">description</span>
-          <span className="text-xs">Apps</span>
-        </Link>
-        <Link to="/add" className="flex flex-col items-center gap-1 text-[#3525cd]">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
-          <span className="text-xs">Add</span>
-        </Link>
-      </nav>
     </div>
   );
 }

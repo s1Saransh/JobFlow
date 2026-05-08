@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const statusStyle = (s) => {
-  if (s === "interview") return "bg-[#e2dfff] text-[#3525cd]";
-  if (s === "offer") return "bg-[#dcfce7] text-[#166534]";
-  if (s === "rejected") return "bg-[#ffdad6] text-[#ba1a1a]";
-  return "bg-[#e2dfff] text-[#3525cd]";
+  if (s === "interview") return "bg-primary-fixed text-primary font-label-sm";
+  if (s === "offer") return "bg-[#dcfce7] text-[#166534] font-label-sm";
+  if (s === "rejected") return "bg-error-container text-error font-label-sm";
+  return "bg-primary-fixed text-primary font-label-sm";
 };
 
 const statusLabel = (s) => {
@@ -35,75 +35,79 @@ export default function Applications() {
     : apps.filter(a => a.status === filter);
 
   if (loading) return (
-    <div className="flex min-h-screen items-center justify-center bg-[#fcf8ff]">
-      <p className="text-[#464555] text-sm">Loading...</p>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <p className="text-on-surface-variant text-body-sm">Loading...</p>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen bg-[#fcf8ff] text-[#1b1b24]">
-      {/* Sidebar */}
-      <aside className="bg-[#f5f2ff] w-64 hidden md:flex flex-col py-6 px-3 border-r border-[#c7c4d8]/30 sticky top-0 h-screen">
-        <div className="px-4 mb-8">
-          <span className="font-bold text-2xl text-[#3525cd]">JobFlow</span>
-          <p className="text-xs text-[#464555]/70 mt-1">Application Tracker</p>
+    <div className="flex min-h-screen bg-background text-on-surface font-body-lg">
+      {/* SideNavBar */}
+      <aside className="bg-surface-container-low dark:bg-on-background shadow-sm docked left-0 h-full w-64 hidden md:flex flex-col gap-base py-md px-sm border-r border-outline-variant/30 dark:border-outline/20">
+        <div className="px-md mb-lg">
+          <h1 className="font-h2 text-h2 font-bold text-primary dark:text-primary-fixed">JobFlow</h1>
+          <p className="text-on-surface-variant font-label-sm mt-xs">Application Tracker</p>
         </div>
-        <nav className="flex-1 flex flex-col gap-1">
-          <Link to="/" className="flex items-center gap-3 py-3 px-4 text-[#464555] hover:text-[#3525cd] hover:bg-[#e4e1ee] transition-all text-sm rounded-r-full">
-            <span className="material-symbols-outlined">dashboard</span>Dashboard
+        <nav className="flex-1 space-y-base">
+          <Link to="/" className="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            <span className="font-label-md text-label-md">Dashboard</span>
           </Link>
-          <Link to="/applications" className="flex items-center gap-3 py-3 px-4 text-[#3525cd] bg-[#b6b4ff]/20 border-r-4 border-[#3525cd] rounded-r-full font-semibold text-sm">
-            <span className="material-symbols-outlined">description</span>Applications
+          <Link to="/applications" className="flex items-center gap-sm px-md py-sm text-primary dark:text-primary-fixed bg-secondary-container/20 dark:bg-secondary-container/10 border-r-4 border-primary rounded-r-full transition-transform">
+            <span className="material-symbols-outlined" data-icon="description" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
+            <span className="font-label-md text-label-md">Applications</span>
           </Link>
-          <Link to="/add" className="flex items-center gap-3 py-3 px-4 text-[#464555] hover:text-[#3525cd] hover:bg-[#e4e1ee] transition-all text-sm rounded-r-full">
-            <span className="material-symbols-outlined">add_circle</span>Add New
+          <Link to="/add" className="flex items-center gap-sm px-md py-sm text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+            <span className="font-label-md text-label-md">Add New</span>
           </Link>
         </nav>
-        <div className="px-3 pb-4 mt-auto">
-          <button onClick={() => { localStorage.clear(); navigate("/login"); }}
-            className="w-full bg-[#4f46e5] text-white py-3 px-4 rounded-full text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">add</span>New Application
+        <div className="mt-auto px-md py-md">
+          <button onClick={() => { localStorage.clear(); navigate("/login"); }} className="w-full border border-outline-variant text-on-surface-variant py-sm px-md rounded-full font-label-md flex items-center justify-center gap-base hover:bg-surface-container-high transition-all">
+            <span className="material-symbols-outlined">logout</span>
+            Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <header className="bg-[#fcf8ff] shadow-sm flex justify-between items-center w-full px-6 h-16 sticky top-0 z-40">
-          <div className="relative w-full max-w-md">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#777587]">search</span>
-            <input className="w-full pl-10 pr-4 py-2 bg-[#f5f2ff] border border-[#c7c4d8] rounded-lg focus:ring-2 focus:ring-[#3525cd] focus:border-[#3525cd] transition-all outline-none text-sm" placeholder="Search applications..." />
+        {/* TopAppBar */}
+        <header className="bg-surface dark:bg-on-background shadow-sm docked full-width top-0 z-40 flex justify-between items-center w-full px-md h-xl max-w-full">
+          <div className="flex items-center gap-md flex-1">
+            <div className="relative w-full max-w-md">
+              <span className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+              <input className="w-full pl-[44px] pr-md py-base bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-body-sm" placeholder="Search applications..." type="text"/>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 rounded-full text-[#464555] hover:bg-[#eae6f4] transition-colors">
-              <span className="material-symbols-outlined">notifications</span>
+          <div className="flex items-center gap-md">
+            <button className="p-base rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors">
+              <span className="material-symbols-outlined" data-icon="notifications">notifications</span>
             </button>
-            <Link
-              to="/profile"
-              id="topbar-profile-link-apps"
-              title="View your profile"
-              className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-[#c7c4d8]/60 hover:bg-[#eae6f4] hover:border-[#3525cd]/40 transition-all group"
-            >
-              <div className="w-7 h-7 rounded-full bg-[#3525cd]/15 flex items-center justify-center text-[#3525cd] text-xs font-bold flex-shrink-0 group-hover:bg-[#3525cd]/25 transition-colors">
-                {(user.name || "U").charAt(0).toUpperCase()}
-              </div>
-              <span className="text-sm text-[#464555] font-medium group-hover:text-[#3525cd] transition-colors hidden sm:inline">
-                {user.name || "User"}
-              </span>
-            </Link>
+            <div className="flex items-center gap-base pl-md border-l border-outline-variant">
+              <Link to="/profile" title="View your profile" className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-outline-variant/60 hover:bg-surface-container-high hover:border-primary/40 transition-all group">
+                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0 group-hover:bg-primary/25 transition-colors">
+                  {(user.name || "U").charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm text-on-surface-variant font-medium group-hover:text-primary transition-colors hidden sm:inline">
+                  {user.name || "User"}
+                </span>
+              </Link>
+            </div>
           </div>
         </header>
 
-        {/* Content */}
-        <div className="flex-1 px-6 md:px-10 py-10 space-y-10 max-w-[1440px] mx-auto w-full">
-          {/* Header & Filters */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h2 className="text-4xl font-bold text-[#1b1b24]">Applications</h2>
-              <p className="text-[#464555] text-base mt-1">Manage and track your active job search journey.</p>
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto px-lg py-lg space-y-lg max-w-[1440px] mx-auto w-full">
+          
+          {/* Header & Filters Section */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-md">
+            <div className="space-y-xs">
+              <h2 className="font-h1 text-h1 text-on-surface">Applications</h2>
+              <p className="text-on-surface-variant text-body-lg">Manage and track your active job search journey.</p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            {/* Filter Chips */}
+            <div className="flex flex-wrap gap-base">
               {[
                 { key: "all", label: "All Applications" },
                 { key: "progress", label: "In Progress" },
@@ -111,100 +115,99 @@ export default function Applications() {
                 { key: "rejected", label: "Rejected" },
               ].map(f => (
                 <button key={f.key} onClick={() => setFilter(f.key)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${filter === f.key ? "bg-[#4f46e5] text-white" : "border border-[#c7c4d8] text-[#464555] hover:bg-[#eae6f4]"}`}>
+                  className={`px-md py-base rounded-full font-label-md flex items-center gap-xs transition-colors ${filter === f.key ? "bg-primary-container text-on-primary-container" : "border border-outline-variant text-on-surface-variant hover:bg-surface-container-high"}`}>
                   {f.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)] overflow-hidden">
+          {/* Applications List Table View */}
+          <div className="bg-surface-container-lowest rounded-xl shadow-resting overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#c7c4d8] bg-[#f5f2ff]/50">
-                    <th className="px-6 py-4 text-xs font-semibold text-[#464555] uppercase tracking-wider">Company</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-[#464555] uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-[#464555] uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-[#464555] uppercase tracking-wider">Date Applied</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-[#464555] uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-[#464555] uppercase tracking-wider text-right">Action</th>
+                  <tr className="border-b border-outline-variant bg-surface-container-low/50">
+                    <th className="px-md py-md font-label-md text-on-surface-variant uppercase tracking-wider">Company</th>
+                    <th className="px-md py-md font-label-md text-on-surface-variant uppercase tracking-wider">Role</th>
+                    <th className="px-md py-md font-label-md text-on-surface-variant uppercase tracking-wider">Location</th>
+                    <th className="px-md py-md font-label-md text-on-surface-variant uppercase tracking-wider">Date Applied</th>
+                    <th className="px-md py-md font-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+                    <th className="px-md py-md font-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#c7c4d8]/30">
+                <tbody className="divide-y divide-outline-variant/30">
                   {filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-16 text-[#464555]">
-                        <span className="material-symbols-outlined text-[48px] text-[#c7c4d8] block mx-auto">inbox</span>
+                      <td colSpan={6} className="text-center py-16 text-on-surface-variant">
+                        <span className="material-symbols-outlined text-[48px] text-outline-variant block mx-auto">inbox</span>
                         <p className="mt-3">No applications found.</p>
-                        <Link to="/add" className="text-[#3525cd] font-semibold text-sm mt-2 inline-block hover:underline">Add your first one →</Link>
+                        <Link to="/add" className="text-primary font-semibold text-sm mt-2 inline-block hover:underline">Add your first one →</Link>
                       </td>
                     </tr>
                   ) : filtered.map(app => (
-                    <tr key={app._id} className="hover:bg-[#f5f2ff] transition-colors group cursor-pointer">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-[#e4e1ee] rounded-lg flex items-center justify-center text-[#3525cd]">
-                            <span className="material-symbols-outlined">corporate_fare</span>
+                    <tr key={app._id} onClick={() => navigate(`/applications/${app._id}`)} className="hover:bg-surface-container-low transition-colors group cursor-pointer">
+                      <td className="px-md py-lg">
+                        <div className="flex items-center gap-md">
+                          <div className="w-xl h-xl bg-surface-container-highest rounded-lg flex items-center justify-center text-primary">
+                            <span className="material-symbols-outlined" data-icon="corporate_fare">corporate_fare</span>
                           </div>
-                          <span className="font-semibold text-[#1b1b24]">{app.company}</span>
+                          <span className="font-h3 text-h3 text-on-surface">{app.company}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-[#464555]">{app.role}</td>
-                      <td className="px-6 py-5 text-[#464555]">{app.location}</td>
-                      <td className="px-6 py-5 text-[#464555]">{app.appliedDate ? new Date(app.appliedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</td>
-                      <td className="px-6 py-5">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusStyle(app.status)}`}>
+                      <td className="px-md py-lg text-body-lg text-on-surface-variant">{app.role}</td>
+                      <td className="px-md py-lg text-body-lg text-on-surface-variant">{app.location}</td>
+                      <td className="px-md py-lg text-body-lg text-on-surface-variant">{app.appliedDate ? new Date(app.appliedDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}</td>
+                      <td className="px-md py-lg">
+                        <span className={`px-md py-xs rounded-full ${statusStyle(app.status)}`}>
                           {statusLabel(app.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-right">
-                        <Link to={`/applications/${app._id}`}
-                          className="p-2 rounded-full opacity-0 group-hover:opacity-100 hover:bg-[#e4e1ee] transition-all inline-flex">
-                          <span className="material-symbols-outlined">open_in_new</span>
-                        </Link>
+                      <td className="px-md py-lg text-right">
+                        <button className="p-base rounded-full opacity-0 group-hover:opacity-100 hover:bg-surface-container-highest transition-all" onClick={(e) => { e.stopPropagation(); navigate(`/applications/${app._id}`); }}>
+                          <span className="material-symbols-outlined" data-icon="open_in_new">open_in_new</span>
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            {/* Footer */}
-            <div className="flex items-center justify-between px-6 py-4 bg-[#f5f2ff]/30">
-              <span className="text-sm text-[#464555]">Showing {filtered.length} of {apps.length} applications</span>
+            {/* Pagination / Footer */}
+            <div className="flex items-center justify-between px-md py-md bg-surface-container-low/30">
+              <span className="text-body-sm text-on-surface-variant">Showing {filtered.length} of {apps.length} applications</span>
             </div>
           </div>
 
-          {/* Summary Bento Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="md:col-span-2 p-10 bg-[#4f46e5] text-white rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)] flex flex-col justify-between overflow-hidden relative">
+          {/* Summary Cards (Asymmetric Bento Style) */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+            <div className="md:col-span-2 p-lg bg-primary-container text-on-primary-container rounded-xl shadow-resting flex flex-col justify-between overflow-hidden relative">
               <div className="z-10">
-                <h4 className="text-xs font-semibold text-white/80 uppercase tracking-wider">Overview</h4>
-                <div className="mt-6 space-y-3">
-                  <div className="flex justify-between items-center bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                <h4 className="font-label-md text-on-primary-container/80 uppercase">Overview</h4>
+                <div className="mt-md space-y-md">
+                  <div className="flex justify-between items-center bg-white/10 p-md rounded-lg backdrop-blur-sm">
                     <span>Applied</span>
-                    <span className="font-semibold">{apps.filter(a => a.status === "applied").length}</span>
+                    <span className="font-label-md">{apps.filter(a => a.status === "applied").length}</span>
                   </div>
-                  <div className="flex justify-between items-center bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                  <div className="flex justify-between items-center bg-white/10 p-md rounded-lg backdrop-blur-sm">
                     <span>Interview</span>
-                    <span className="font-semibold">{apps.filter(a => a.status === "interview").length}</span>
+                    <span className="font-label-md">{apps.filter(a => a.status === "interview").length}</span>
                   </div>
                 </div>
               </div>
-              <div className="absolute -right-16 -bottom-16 text-white/5 pointer-events-none">
-                <span className="material-symbols-outlined text-[160px]">event_upcoming</span>
+              <div className="absolute -right-xl -bottom-xl text-white/5 pointer-events-none">
+                <span className="material-symbols-outlined text-[160px]" data-icon="event_upcoming">event_upcoming</span>
               </div>
             </div>
-            <div className="p-10 bg-[#e4e1ee] rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)] flex flex-col items-center justify-center text-center">
-              <span className="text-4xl font-bold text-[#3525cd]">
+            <div className="p-lg bg-surface-container-highest rounded-xl shadow-resting flex flex-col items-center justify-center text-center">
+              <span className="text-h1 font-h1 text-primary">
                 {apps.length > 0 ? `${Math.round((apps.filter(a => a.status !== "rejected").length / apps.length) * 100)}%` : "—"}
               </span>
-              <p className="text-sm font-semibold text-[#464555] mt-2">Response Rate</p>
+              <p className="font-label-md text-on-surface-variant mt-base">Response Rate</p>
             </div>
-            <div className="p-10 bg-white rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.1)] flex flex-col items-center justify-center text-center">
-              <span className="text-4xl font-bold text-[#58579b]">{apps.filter(a => a.status === "applied" || a.status === "interview").length}</span>
-              <p className="text-sm font-semibold text-[#464555] mt-2">Active Apps</p>
+            <div className="p-lg bg-white rounded-xl shadow-resting flex flex-col items-center justify-center text-center">
+              <span className="text-h1 font-h1 text-secondary">{apps.filter(a => a.status === "applied" || a.status === "interview").length}</span>
+              <p className="font-label-md text-on-surface-variant mt-base">Active Apps</p>
             </div>
           </div>
         </div>

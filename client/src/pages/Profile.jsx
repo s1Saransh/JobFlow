@@ -1,27 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-/* ─── helpers ──────────────────────────────────────────── */
 const getToken = () => localStorage.getItem("token");
 
 export default function Profile() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  /* ── state ─────────────────────────────────────────────── */
-  const [profile, setProfile]   = useState(null);
-  const [editing, setEditing]   = useState(false);
-  const [saving,  setSaving]    = useState(false);
-  const [loading, setLoading]   = useState(true);
-  const [error,   setError]     = useState(null);
-  const [success, setSuccess]   = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  /* draft fields shown while editing */
   const [draft, setDraft] = useState({
     name: "", phone: "", linkedin: "", bio: "", avatar: "",
   });
 
-  /* ── fetch profile on mount ─────────────────────────────── */
   useEffect(() => {
     const token = getToken();
     if (!token) { navigate("/login"); return; }
@@ -37,22 +34,20 @@ export default function Profile() {
         if (!data) return;
         setProfile(data);
         setDraft({
-          name:     data.name     || "",
-          phone:    data.phone    || "",
+          name: data.name || "",
+          phone: data.phone || "",
           linkedin: data.linkedin || "",
-          bio:      data.bio      || "",
-          avatar:   data.avatar   || "",
+          bio: data.bio || "",
+          avatar: data.avatar || "",
         });
       })
       .catch(() => setError("Failed to load profile."))
       .finally(() => setLoading(false));
   }, [navigate]);
 
-  /* ── avatar upload ──────────────────────────────────────── */
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // limit to ~2 MB
     if (file.size > 2 * 1024 * 1024) {
       setError("Image must be smaller than 2 MB.");
       return;
@@ -64,7 +59,6 @@ export default function Profile() {
 
   const removeAvatar = () => setDraft((d) => ({ ...d, avatar: "" }));
 
-  /* ── save ───────────────────────────────────────────────── */
   const handleSave = async () => {
     setSaving(true);
     setError(null);
@@ -72,14 +66,15 @@ export default function Profile() {
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: {
-          "Content-Type":  "application/json",
-          Authorization:   `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
         },
         body: JSON.stringify(draft),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.message || "Save failed."); return; }
       setProfile(data);
+      localStorage.setItem("user", JSON.stringify({ name: data.name, email: data.email }));
       setEditing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -92,379 +87,190 @@ export default function Profile() {
 
   const cancelEdit = () => {
     setDraft({
-      name:     profile?.name     || "",
-      phone:    profile?.phone    || "",
+      name: profile?.name || "",
+      phone: profile?.phone || "",
       linkedin: profile?.linkedin || "",
-      bio:      profile?.bio      || "",
-      avatar:   profile?.avatar   || "",
+      bio: profile?.bio || "",
+      avatar: profile?.avatar || "",
     });
     setError(null);
     setEditing(false);
   };
 
-  /* ── derived ────────────────────────────────────────────── */
   const displayAvatar = editing ? draft.avatar : profile?.avatar;
-  const initials = (profile?.name || "?")
-    .split(" ")
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const initials = (profile?.name || "?").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
-  /* ── render ─────────────────────────────────────────────── */
-  if (loading) {
-    return (
-      <div className="app-layout">
-        <ProfileSidebar profile={profile} />
-        <main className="main-content">
-          <div className="profile-loading">
-            <div className="profile-spinner" />
-            <p>Loading profile…</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <p className="text-on-surface-variant text-body-sm">Loading...</p>
+    </div>
+  );
 
   return (
-    <div className="app-layout">
-      <ProfileSidebar profile={profile} />
+    <div className="flex min-h-screen bg-background text-on-surface font-body-lg">
+      {/* SideNavBar Component */}
+      <aside className="bg-surface-container-low dark:bg-on-background shadow-sm docked left-0 h-full w-64 hidden md:flex flex-col gap-base py-md px-sm border-r border-outline-variant/30 dark:border-outline/20 sticky top-0">
+        <div className="px-md py-base mb-lg">
+          <span className="font-h2 text-h2 font-bold text-primary dark:text-primary-fixed">JobFlow</span>
+          <p className="font-label-sm text-on-surface-variant/70 mt-xs">Application Tracker</p>
+        </div>
+        <nav className="flex flex-col gap-xs flex-grow">
+          <Link to="/" className="flex items-center gap-sm py-sm px-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            Dashboard
+          </Link>
+          <Link to="/applications" className="flex items-center gap-sm py-sm px-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="description">description</span>
+            Applications
+          </Link>
+          <Link to="/add" className="flex items-center gap-sm py-sm px-md text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed font-label-md text-label-md hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-all duration-200 rounded-r-full">
+            <span className="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+            Add New
+          </Link>
+        </nav>
+      </aside>
 
-      <main className="main-content">
-        <div className="page-container">
-
-          {/* ── Page header ─────────────────────────────────── */}
-          <div className="page-header">
-            <div>
-              <h1>My Profile</h1>
-              <p className="page-subtitle">Manage your personal information</p>
-            </div>
-
-            {/* LinkedIn quick-link — top-right */}
-            {profile?.linkedin && !editing && (
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-linkedin"
-                id="linkedin-link"
-              >
-                <svg className="btn-li-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
-                LinkedIn
-              </a>
-            )}
+      {/* Main Content Area */}
+      <div className="flex-grow flex flex-col min-w-0">
+        {/* TopAppBar Component */}
+        <header className="bg-surface dark:bg-on-background shadow-sm docked full-width top-0 z-40 flex justify-between items-center w-full px-md h-xl max-w-full">
+          <div className="flex items-center gap-md">
+            <h1 className="font-h3 text-h3 font-semibold text-primary dark:text-primary-fixed md:hidden">JobFlow</h1>
+            <h2 className="text-h3 font-h3 text-on-surface hidden md:block">My Profile</h2>
           </div>
+          <div className="flex items-center gap-md">
+            <Link to="/add" className="hidden lg:flex items-center gap-xs bg-primary text-on-primary py-xs px-md rounded-full font-label-md transition-all hover:opacity-90">
+                New Application
+            </Link>
+            <div className="flex items-center gap-sm border-l border-outline-variant pl-md ml-xs">
+              <Link to="/profile" title="View your profile" className="flex items-center gap-2 py-1.5 px-3 rounded-full border border-primary hover:bg-surface-container-high transition-all group bg-primary/5">
+                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0">
+                  {initials}
+                </div>
+                <span className="text-sm text-primary font-medium hidden sm:inline">
+                  {profile.name}
+                </span>
+              </Link>
+            </div>
+          </div>
+        </header>
 
-          {/* ── Success / Error banners ──────────────────────── */}
+        {/* Content Canvas */}
+        <main className="p-md md:p-lg lg:p-xl max-w-[800px] mx-auto w-full space-y-xl overflow-y-auto">
           {success && (
-            <div className="profile-banner profile-banner--success">
-              ✅ Profile updated successfully!
+            <div className="p-sm bg-tertiary-fixed/40 text-tertiary rounded-lg font-label-md flex items-center gap-xs border border-tertiary-fixed">
+              <span className="material-symbols-outlined text-[18px]">check_circle</span>
+              Profile updated successfully!
             </div>
           )}
           {error && (
-            <div className="profile-banner profile-banner--error">
-              ⚠️ {error}
+            <div className="p-sm bg-error-container text-error rounded-lg font-label-md border border-error-container/50">
+              {error}
             </div>
           )}
 
-          {/* ── Avatar card ─────────────────────────────────── */}
-          <div className="card profile-avatar-card">
-            <div className="profile-avatar-area">
-              {/* Avatar image or initials */}
-              <div className="profile-avatar-wrap">
+          <div className="bg-white p-lg md:p-xl rounded-xl shadow-resting border border-outline-variant/30 flex flex-col gap-lg">
+            
+            {/* Header / Avatar area */}
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-lg pb-lg border-b border-outline-variant/30">
+              <div className="relative group">
                 {displayAvatar ? (
-                  <img
-                    src={displayAvatar}
-                    alt="Profile"
-                    className="profile-avatar-img"
-                    id="profile-avatar-img"
-                  />
+                  <img src={displayAvatar} alt="Avatar" className="w-32 h-32 rounded-full object-cover border-4 border-surface-container-highest shadow-sm" />
                 ) : (
-                  <div className="profile-avatar-placeholder" id="profile-avatar-placeholder">
+                  <div className="w-32 h-32 rounded-full bg-primary-container/20 border-4 border-surface-container-highest shadow-sm flex items-center justify-center text-primary text-4xl font-bold">
                     {initials}
                   </div>
                 )}
 
-                {/* Edit-mode overlay */}
                 {editing && (
-                  <button
-                    className="profile-avatar-overlay"
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload photo"
-                    id="upload-avatar-btn"
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                      <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                    <span>Change photo</span>
-                  </button>
-                )}
-              </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                id="avatar-file-input"
-                onChange={handleAvatarChange}
-              />
-
-              {/* Avatar action buttons */}
-              <div className="profile-avatar-actions">
-                <div className="profile-name-display">
-                  <h2>{profile?.name}</h2>
-                  <p className="page-subtitle">{profile?.email}</p>
-                </div>
-                {editing && (
-                  <div className="profile-avatar-btns">
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      id="change-photo-btn"
-                    >
-                      📷 Upload Photo
+                  <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-xs">
+                    <button onClick={() => fileInputRef.current?.click()} className="p-xs bg-white text-on-surface rounded-full shadow hover:bg-surface-container-high" title="Upload new photo">
+                      <span className="material-symbols-outlined text-[18px]">upload</span>
                     </button>
-                    {draft.avatar && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={removeAvatar}
-                        id="remove-photo-btn"
-                      >
-                        🗑 Remove
+                    {displayAvatar && (
+                      <button onClick={removeAvatar} className="p-xs bg-error-container text-error rounded-full shadow hover:bg-error-container/80" title="Remove photo">
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
                       </button>
                     )}
                   </div>
                 )}
+                <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleAvatarChange} />
               </div>
 
-              {/* Edit / Save buttons */}
-              <div className="profile-header-actions">
-                {!editing ? (
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setEditing(true)}
-                    id="edit-profile-btn"
-                  >
-                    ✏️ Edit Profile
-                  </button>
-                ) : (
-                  <div className="form-actions">
-                    <button className="btn btn-ghost" onClick={cancelEdit} id="cancel-edit-btn">
-                      Cancel
-                    </button>
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleSave}
-                      disabled={saving}
-                      id="save-profile-btn"
-                    >
-                      {saving ? "Saving…" : "💾 Save Changes"}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Details card ─────────────────────────────────── */}
-          <div className="card profile-details-card">
-            <h3 className="profile-section-title">Personal Information</h3>
-
-            <div className="profile-fields">
-              {/* Full Name */}
-              <div className="profile-field">
-                <label className="profile-field-label">
-                  <span className="profile-field-icon">👤</span> Full Name
-                </label>
+              <div className="flex-1 text-center md:text-left space-y-xs">
                 {editing ? (
-                  <input
-                    id="field-name"
-                    className="input"
-                    value={draft.name}
-                    onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                    placeholder="Your full name"
-                  />
+                  <>
+                    <label className="font-label-sm text-outline block mb-xs">Full Name</label>
+                    <input type="text" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} className="w-full px-sm py-xs bg-surface-bright border border-outline-variant rounded focus:ring-1 focus:ring-primary outline-none font-h2 text-h2" />
+                  </>
                 ) : (
-                  <p className="profile-field-value">{profile?.name || "—"}</p>
-                )}
-              </div>
-
-              {/* Email (read-only) */}
-              <div className="profile-field">
-                <label className="profile-field-label">
-                  <span className="profile-field-icon">✉️</span> Email Address
-                </label>
-                <p className="profile-field-value profile-field-value--muted">
-                  {profile?.email}
-                  <span className="profile-badge">read-only</span>
-                </p>
-              </div>
-
-              {/* Phone */}
-              <div className="profile-field">
-                <label className="profile-field-label">
-                  <span className="profile-field-icon">📞</span> Phone Number
-                </label>
-                {editing ? (
-                  <input
-                    id="field-phone"
-                    className="input"
-                    type="tel"
-                    value={draft.phone}
-                    onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
-                    placeholder="+1 (555) 000-0000"
-                  />
-                ) : (
-                  <p className="profile-field-value">
-                    {profile?.phone || <span className="profile-empty">Not added yet</span>}
-                  </p>
-                )}
-              </div>
-
-              {/* LinkedIn */}
-              <div className="profile-field">
-                <label className="profile-field-label">
-                  <span className="profile-field-icon">
-                    <svg style={{width:14,height:14,verticalAlign:"middle"}} viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                  </span>{" "}
-                  LinkedIn Profile URL
-                </label>
-                {editing ? (
-                  <input
-                    id="field-linkedin"
-                    className="input"
-                    type="url"
-                    value={draft.linkedin}
-                    onChange={(e) => setDraft({ ...draft, linkedin: e.target.value })}
-                    placeholder="https://linkedin.com/in/yourname"
-                  />
-                ) : (
-                  <p className="profile-field-value">
-                    {profile?.linkedin ? (
-                      <a
-                        href={profile.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="profile-link"
-                      >
-                        {profile.linkedin}
+                  <>
+                    <h2 className="font-h1 text-h1 text-on-surface">{profile.name}</h2>
+                    <p className="font-body-lg text-outline">{profile.email}</p>
+                    {profile.linkedin && (
+                      <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-xs mt-sm text-secondary hover:underline font-label-md">
+                        <span className="material-symbols-outlined text-[16px]">link</span> LinkedIn Profile
                       </a>
-                    ) : (
-                      <span className="profile-empty">Not added yet</span>
                     )}
-                  </p>
-                )}
-              </div>
-
-              {/* Bio */}
-              <div className="profile-field profile-field--full">
-                <label className="profile-field-label">
-                  <span className="profile-field-icon">📝</span> About / Bio
-                </label>
-                {editing ? (
-                  <textarea
-                    id="field-bio"
-                    className="input textarea"
-                    value={draft.bio}
-                    onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
-                    placeholder="Tell us a little about yourself…"
-                    rows={4}
-                  />
-                ) : (
-                  <p className="profile-field-value profile-field-value--bio">
-                    {profile?.bio || <span className="profile-empty">No bio added yet</span>}
-                  </p>
+                  </>
                 )}
               </div>
             </div>
+
+            {/* Details area */}
+            <div className="space-y-md">
+              <div className="flex items-center justify-between">
+                <h3 className="font-h3 text-h3 text-on-surface">Personal Information</h3>
+                {!editing && (
+                  <button onClick={() => setEditing(true)} className="px-md py-sm rounded-full font-label-md text-primary border border-outline-variant hover:bg-surface-container-high transition-colors flex items-center gap-xs">
+                    <span className="material-symbols-outlined text-[18px]">edit</span> Edit
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                <div className="space-y-xs">
+                  <label className="font-label-sm text-outline">Phone Number</label>
+                  {editing ? (
+                    <input type="tel" value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} className="w-full px-sm py-xs bg-surface-bright border border-outline-variant rounded focus:ring-1 focus:ring-primary outline-none font-body-sm" placeholder="+1 (555) 000-0000" />
+                  ) : (
+                    <p className="font-body-lg text-on-surface">{profile.phone || "—"}</p>
+                  )}
+                </div>
+                <div className="space-y-xs">
+                  <label className="font-label-sm text-outline">LinkedIn URL</label>
+                  {editing ? (
+                    <input type="url" value={draft.linkedin} onChange={(e) => setDraft({ ...draft, linkedin: e.target.value })} className="w-full px-sm py-xs bg-surface-bright border border-outline-variant rounded focus:ring-1 focus:ring-primary outline-none font-body-sm" placeholder="https://linkedin.com/in/..." />
+                  ) : (
+                    <p className="font-body-lg text-on-surface truncate">{profile.linkedin || "—"}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-xs pt-sm">
+                <label className="font-label-sm text-outline">Bio / Summary</label>
+                {editing ? (
+                  <textarea value={draft.bio} onChange={(e) => setDraft({ ...draft, bio: e.target.value })} rows={4} className="w-full px-sm py-xs bg-surface-bright border border-outline-variant rounded focus:ring-1 focus:ring-primary outline-none font-body-sm" placeholder="A brief professional summary..." />
+                ) : (
+                  <p className="font-body-sm text-on-surface-variant whitespace-pre-wrap">{profile.bio || "No bio added yet."}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            {editing && (
+              <div className="flex justify-end gap-sm pt-lg border-t border-outline-variant/30">
+                <button onClick={cancelEdit} disabled={saving} className="px-lg py-sm rounded-full font-label-md text-primary border border-outline-variant hover:bg-surface-container-high transition-colors">
+                  Cancel
+                </button>
+                <button onClick={handleSave} disabled={saving} className="px-lg py-sm rounded-full font-label-md bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-sm hover:shadow-hover transition-all disabled:opacity-50 flex items-center gap-xs">
+                  {saving ? "Saving..." : <><span className="material-symbols-outlined text-[18px]">save</span> Save Profile</>}
+                </button>
+              </div>
+            )}
           </div>
-
-          {/* ── Member since ─────────────────────────────────── */}
-          <p className="profile-member-since">
-            Member since{" "}
-            {profile?.createdAt
-              ? new Date(profile.createdAt).toLocaleDateString("en-US", {
-                  month: "long", day: "numeric", year: "numeric",
-                })
-              : "—"}
-          </p>
-
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
-  );
-}
-
-/* ── Sidebar extracted so Profile page owns its own layout ── */
-function ProfileSidebar({ profile }) {
-  const navigate = useNavigate();
-
-  const navItems = [
-    { to: "/",            label: "Dashboard",    icon: "📊" },
-    { to: "/applications",label: "Applications", icon: "📋" },
-    { to: "/add",         label: "Add New",      icon: "➕" },
-    { to: "/profile",     label: "Profile",      icon: "👤" },
-  ];
-
-  const handleSignOut = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
-  const initials = (profile?.name || "?")
-    .split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-
-  return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <span className="logo-icon">⚡</span>
-        <span className="logo-text">JobFlow</span>
-      </div>
-
-      <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            className={({ isActive }) =>
-              `nav-link ${isActive ? "nav-link--active" : ""}`
-            }
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="sidebar-footer">
-        {/* Mini profile chip */}
-        <NavLink to="/profile" className="sidebar-profile-chip">
-          {profile?.avatar ? (
-            <img src={profile.avatar} alt="" className="sidebar-chip-avatar" />
-          ) : (
-            <div className="sidebar-chip-initials">{initials}</div>
-          )}
-          <div className="sidebar-chip-info">
-            <span className="sidebar-chip-name">{profile?.name || "User"}</span>
-            <span className="sidebar-chip-email">{profile?.email || ""}</span>
-          </div>
-        </NavLink>
-
-        <button
-          onClick={handleSignOut}
-          className="btn btn-ghost btn-full"
-          id="sign-out-btn"
-        >
-          Sign Out
-        </button>
-      </div>
-    </aside>
   );
 }
