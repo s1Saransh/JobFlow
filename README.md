@@ -1,6 +1,13 @@
 # ⚡ JobFlow — Job Application Tracker
 
-A modern, full-stack job application tracker built with the **MERN** stack (MongoDB · Express · React · Node.js).
+A modern, full-stack job application tracker built with the **MERN** stack (MongoDB · Express · React · Node.js). 
+
+## ✨ Features
+- **User Authentication:** Secure JWT-based login and registration.
+- **Application Tracking:** Add, edit, delete, and view your job applications.
+- **Status Updates:** Easily move applications through different stages (Applied, Interview, Offer, Rejected).
+- **User Profiles:** Customize your personal profile, including a profile picture, bio, LinkedIn link, and contact details.
+- **Modern UI:** A beautiful, responsive "glassmorphism" design system tailored for a premium user experience.
 
 ## 📁 Project Structure
 
@@ -8,15 +15,18 @@ A modern, full-stack job application tracker built with the **MERN** stack (Mong
 jobflow/
 ├── client/            ← Vite + React frontend
 │   ├── src/
-│   │   ├── layouts/   ← AppLayout (sidebar + outlet)
-│   │   ├── pages/     ← Dashboard, Applications, AddApplication, Login
+│   │   ├── layouts/   ← AppLayout (sidebar + user profile chip)
+│   │   ├── pages/     ← Dashboard, Applications, ApplicationDetail, AddApplication, Login, Profile
 │   │   ├── App.jsx    ← React Router v6 routes
 │   │   ├── main.jsx   ← Entry point
-│   │   └── index.css  ← Global design system
+│   │   └── index.css  ← Global design system and components
 │   └── package.json
 ├── server/            ← Node.js + Express backend
 │   ├── src/
-│   │   └── index.js   ← Express server entry point
+│   │   ├── controllers/ ← Business logic (auth, applications, profiles)
+│   │   ├── models/      ← Mongoose schemas
+│   │   ├── routes/      ← Express API routes
+│   │   └── index.js     ← Express server entry point
 │   └── package.json
 ├── .env.example       ← All environment variables
 ├── .gitignore
@@ -69,10 +79,10 @@ npm run dev:client
 | Layer    | Tech                             |
 | -------- | -------------------------------- |
 | Frontend | React 19, Vite, React Router v6  |
-| Backend  | Node.js, Express 4               |
+| Backend  | Node.js, Express                 |
 | Database | MongoDB + Mongoose               |
-| Auth     | JWT (planned)                    |
-| Styling  | Vanilla CSS, Inter font          |
+| Auth     | JSON Web Tokens (JWT) & bcryptjs |
+| Styling  | Vanilla CSS, Glassmorphism UI    |
 
 ## 📜 License
 
