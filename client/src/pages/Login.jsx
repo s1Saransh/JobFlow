@@ -33,10 +33,15 @@ export default function Login() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      const data = responseText ? JSON.parse(responseText) : null;
 
       if (!response.ok) {
-        throw new Error(data.message || "Authentication failed");
+        throw new Error(data?.message || "Authentication service is unavailable. Please try again shortly.");
+      }
+
+      if (!data?.token) {
+        throw new Error("Authentication service returned an invalid response.");
       }
 
       // Save token to localStorage

@@ -6,7 +6,6 @@ const getToken = () => localStorage.getItem("token");
 export default function Profile() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const [profile, setProfile] = useState(null);
   const [editing, setEditing] = useState(false);

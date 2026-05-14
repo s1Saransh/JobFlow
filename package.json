@@ -10,9 +10,17 @@
     "install:client": "npm install --prefix client",
     "install:server": "npm install --prefix server",
     "install:all": "npm run install:client && npm run install:server",
-    "dev": "npm run dev:client & npm run dev:server"
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
   },
-  "keywords": ["job-tracker", "mern", "react", "express"],
+  "keywords": [
+    "job-tracker",
+    "mern",
+    "react",
+    "express"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }
